@@ -4,6 +4,9 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 
+use Goutte\Client;
+//use Symfony\Component\HttpClient\HttpClient;
+
 class solicitudPost extends Command
 {
     /**
@@ -11,9 +14,7 @@ class solicitudPost extends Command
      *
      * @var string
      */
-    protected $signature = 'checkpost
-                            {url: Url to check}
-                            {status=200 : Status spected}';
+    protected $signature = 'checkpost';
 
     /**
      * The console command description.
@@ -27,9 +28,11 @@ class solicitudPost extends Command
      *
      * @return void
      */
-    public function __construct()
+    public function __construct(Client $client)
     {
         parent::__construct();
+
+        $this->client = $client;
     }
 
     /**
@@ -39,6 +42,26 @@ class solicitudPost extends Command
      */
     public function handle()
     {
+        try {
+            $url = 'https://atomic.incfile.com/fakepost';
+            $expected = (int) 200;
+            $crawler = $this->client->request('POST', $url);
+            $status = $this->client->getResponse();
+        } catch (\Exception $e) {
+            $this->error("Solicitud failed for $url with an exception");
+            $this->error($e->getMessage());
+            return 2;
+        }
+
+        if ($status !== $expected) {
+            $this->error("Solicitud failed for $url with a status of '$status' (expected '$expected')");
+            return 1;
+        }
+
+        $this->info("Solicitud passed for $url!");
+
         return 0;
     }
+
+    
 }
