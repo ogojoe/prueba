@@ -16,12 +16,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->singleton(Client::class, function ($app) {
-
-        $client = new Client(HttpClient::create(['timeout' => 60]));
-
-        return $client;
-    });
+        //
     }
 
     /**

@@ -33,6 +33,7 @@ class solicitudPost extends Command
         parent::__construct();
 
         $this->client = $client;
+
     }
 
     /**
@@ -46,6 +47,7 @@ class solicitudPost extends Command
             $url = 'https://atomic.incfile.com/fakepost';
             $expected = (int) 200;
             $crawler = $this->client->request('POST', $url);
+            
             $status = $this->client->getResponse();
         } catch (\Exception $e) {
             $this->error("Solicitud failed for $url with an exception");
@@ -53,7 +55,10 @@ class solicitudPost extends Command
             return 2;
         }
 
-        if ($status !== $expected) {
+        $respuesta = $crawler->filter('h1')->first()->extract(['_text']);
+        $codigoStatus= (int) $respuesta[0];
+
+        if ($codigoStatus !== $expected) {
             $this->error("Solicitud failed for $url with a status of '$status' (expected '$expected')");
             return 1;
         }
